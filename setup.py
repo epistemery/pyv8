@@ -40,11 +40,12 @@ from setuptools.command.develop import develop as _develop
 PYV8_HOME = os.path.abspath(os.path.dirname(__file__))
 BOOST_HOME = None
 BOOST_MT = is_osx
-BOOST_STATIC_LINK = False
+BOOST_STATIC_LINK = True
 PYTHON_HOME = None
 V8_HOME = None
 V8_SVN_URL = "http://v8.googlecode.com/svn/trunk/"
-V8_SVN_REVISION = None
+#V8_SVN_REVISION = None
+V8_SVN_REVISION = 19177
 
 v8_svn_rev_file = os.path.normpath(os.path.join(os.path.dirname(__file__), 'REVISION'))
 
@@ -138,7 +139,7 @@ if V8_OBJECT_PRINT:
 if V8_DEBUGGER_SUPPORT:
     macros += [("ENABLE_DEBUGGER_SUPPORT", None)]
 
-boost_libs = ['boost_python', 'boost_thread', 'boost_system']
+boost_libs = ['boost_python3', 'boost_thread', 'boost_system']
 
 if BOOST_MT:
     boost_libs = [lib + '-mt' for lib in boost_libs]
@@ -200,11 +201,11 @@ if is_winnt:
     os.putenv('DISTUTILS_USE_SDK', 'true')
 elif is_linux or is_freebsd:
     if BOOST_HOME:
-        boost_lib_dir = os.path.join(BOOST_HOME, 'stage/lib')
+        boost_lib_dir = os.path.join(BOOST_HOME, 'lib')
         include_dirs += [BOOST_HOME]
     else:
-        boost_lib_dir = '/usr/local/lib'
-        include_dirs += ['/usr/local/include']
+        boost_lib_dir = '/usr/lib'
+        include_dirs += ['/usr/include']
 
     library_dirs += [
         boost_lib_dir,
@@ -215,10 +216,15 @@ elif is_linux or is_freebsd:
         library_dirs += [os.path.join(PYTHON_HOME, 'lib/python%d.%d' % (major, minor))]
         include_dirs += [os.path.join(PYTHON_HOME, 'include')]
 
+    library_dirs += ['/usr/lib/python%d.%d' % (3, 2)]
+
+    print(library_dirs)
+
     extra_compile_args += ["-Wno-write-strings"]
 
     if BOOST_STATIC_LINK:
         extra_link_args += [os.path.join(boost_lib_dir, "lib%s.a") % lib for lib in boost_libs]
+        print(extra_link_args)
     else:
         libraries += boost_libs
 
@@ -508,7 +514,8 @@ def build_v8():
 
         options = ' '.join(["%s=%s" % (k, v) for k, v in list(options.items())])
 
-        cmdline = "%s -j 8 %s %s.%s" % (MAKE, options, arch, mode)
+        cmdline = "%s %s %s.%s" % (MAKE, options, arch, mode)
+        #cmdline = "%s -j 8 %s %s.%s" % (MAKE, options, arch, mode)
 
         exec_cmd(cmdline, "build v8 from SVN")
 
