@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import with_statement
-from __future__ import print_function
+
+
 
 import sys
 import os
@@ -506,7 +506,7 @@ def build_v8():
     else:
         print("INFO: building Google v8 with GYP for %s platform with %s mode" % (arch, mode))
 
-        options = ' '.join(["%s=%s" % (k, v) for k, v in options.items()])
+        options = ' '.join(["%s=%s" % (k, v) for k, v in list(options.items())])
 
         cmdline = "%s -j 8 %s %s.%s" % (MAKE, options, arch, mode)
 
@@ -520,7 +520,7 @@ def generate_probes():
         print("INFO: automatic make the build folder: %s" % build_path)
 
         try:
-            os.makedirs(build_path, 0755)
+            os.makedirs(build_path, 0o755)
         except os.error as ex:
             print("WARN: fail to create the build folder, %s" % ex)
 
